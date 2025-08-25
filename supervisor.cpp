@@ -7,9 +7,10 @@
 #include <sys/time.h>
 #include <time.h>
 
+#include "hello_from_supervisor.h"
 
 int main(int argc, char* argv[])
 {
-	printf("I am supervisor!\n");
+	hello_from_supervisor();
 	return 0;
 }

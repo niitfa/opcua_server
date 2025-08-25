@@ -7,9 +7,11 @@
 #include <sys/time.h>
 #include <time.h>
 
+#include "hello_from_node.h"
+
 
 int main(int argc, char* argv[])
 {
-	printf("I am node!\n");
+	hello_from_node();
 	return 0;
 }
