@@ -1,17 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
-#include <stdio.h>
-#include <sys/time.h>
-#include <time.h>
-
-#include "hello_from_node.h"
-
+#include "server_pubsub_subscribe_rt_state_machine.h"
 
 int main(int argc, char* argv[])
 {
-	hello_from_node();
-	return 0;
+	return server_pubsub_subscribe_rt_state_machine(argc, argv);
 }

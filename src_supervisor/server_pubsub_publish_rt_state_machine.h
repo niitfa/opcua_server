@@ -1,0 +1,6 @@
+#ifndef SERVER_PUBSUB_PUBLISH_RT_STATE_MACHINE_H
+#define SERVER_PUBSUB_PUBLISH_RT_STATE_MACHINE_H
+
+int server_pubsub_publish_rt_state_machine(void);
+
+#endif

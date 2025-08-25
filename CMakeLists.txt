@@ -17,7 +17,7 @@ set(target_node node)
 file(GLOB_RECURSE sources_supervisor ${source_supervisor_dir}/*${source_ext})
 file(GLOB_RECURSE headers_supervisor ${source_supervisor_dir}/*${header_ext})
 add_executable(${target_supervisor} supervisor${source_ext} ${sources_supervisor})
-target_link_libraries(${target_supervisor} m open62541 pthread)
+target_link_libraries(${target_supervisor} rt m open62541 pthread)
 
 # Node target
 file(GLOB_RECURSE sources_node ${source_node_dir}/*${source_ext})

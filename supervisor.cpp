@@ -1,16 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
-#include <stdio.h>
-#include <sys/time.h>
-#include <time.h>
-
-#include "hello_from_supervisor.h"
+#include "server_pubsub_publish_rt_state_machine.h"
 
 int main(int argc, char* argv[])
 {
-	hello_from_supervisor();
-	return 0;
+	return server_pubsub_publish_rt_state_machine();
 }
