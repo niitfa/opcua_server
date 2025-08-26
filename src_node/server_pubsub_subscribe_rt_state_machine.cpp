@@ -208,7 +208,6 @@ connectionStateMachine(UA_Server *server, const UA_NodeId componentId,
         default:
             return UA_STATUSCODE_BADINTERNALERROR;
     }
-
     return UA_STATUSCODE_GOOD;
 }
 
@@ -298,8 +297,8 @@ addSubscribedVariables (UA_Server *server) {
 }
 
 /* Add DataSetReader to the ReaderGroup */
-static void
-addDataSetReader(UA_Server *server) {
+static void addDataSetReader(UA_Server *server) 
+{
     memset(&readerConfig, 0, sizeof(UA_DataSetReaderConfig));
     readerConfig.name = UA_STRING_ALLOC("DataSet Reader 1");
     UA_UInt16 publisherIdentifier = 2234;
@@ -350,7 +349,7 @@ addDataSetReader(UA_Server *server) {
 }
 
 int server_pubsub_subscribe_rt_state_machine(int argc, char **argv) {
-    if(argc > 1) {
+    /*if(argc > 1) {
         if(strcmp(argv[1], "-h") == 0) {
             printf("usage: %s <uri> [device]\n", argv[0]);
             return EXIT_SUCCESS;
@@ -371,7 +370,7 @@ int server_pubsub_subscribe_rt_state_machine(int argc, char **argv) {
         }
     }
     if(argc > 2)
-        networkAddressUrl.networkInterface = UA_STRING(argv[2]);
+        networkAddressUrl.networkInterface = UA_STRING(argv[2]); */
 
     /* Return value initialized to Status Good */
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
