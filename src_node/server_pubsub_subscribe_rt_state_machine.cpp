@@ -219,12 +219,21 @@ addPubSubConnection(UA_Server *server) {
     memset (&connectionConfig, 0, sizeof(UA_PubSubConnectionConfig));
     connectionConfig.name = UA_STRING("UDPMC Connection 1");
     connectionConfig.transportProfileUri = transportProfile;
+
+    // wtf is this???? MULTICAST GROUP ADDRESS!!
     UA_Variant_setScalar(&connectionConfig.address, &networkAddressUrl,
                          &UA_TYPES[UA_TYPES_NETWORKADDRESSURLDATATYPE]);
+
     connectionConfig.publisherId.idType = UA_PUBLISHERIDTYPE_UINT32;
-    connectionConfig.publisherId.id.uint32 = UA_UInt32_random();
+    connectionConfig.publisherId.id.uint32 = UA_UInt32_random();   
     connectionConfig.customStateMachine = connectionStateMachine;
-    UA_Server_addPubSubConnection(server, &connectionConfig, &connectionIdentifier);
+
+    // set new connection
+    UA_Server_addPubSubConnection(
+        server, // target server
+        &connectionConfig, // passing config
+        &connectionIdentifier // address of the variable id is written to
+    );
 }
 
 /* Add ReaderGroup to the created connection */
@@ -301,9 +310,8 @@ static void addDataSetReader(UA_Server *server)
 {
     memset(&readerConfig, 0, sizeof(UA_DataSetReaderConfig));
     readerConfig.name = UA_STRING_ALLOC("DataSet Reader 1");
-    UA_UInt16 publisherIdentifier = 2234;
     readerConfig.publisherId.idType = UA_PUBLISHERIDTYPE_UINT16;
-    readerConfig.publisherId.id.uint16 = publisherIdentifier;
+    readerConfig.publisherId.id.uint16 = 2234;
     readerConfig.writerGroupId    = 100;
     readerConfig.dataSetWriterId  = 62541;
     readerConfig.messageSettings.encoding = UA_EXTENSIONOBJECT_DECODED;
@@ -344,8 +352,13 @@ static void addDataSetReader(UA_Server *server)
     }
 
     addSubscribedVariables(server);
-    UA_Server_addDataSetReader(server, readerGroupIdentifier, &readerConfig, &readerIdentifier);
-    UA_DataSetReaderConfig_clear(&readerConfig);
+    UA_Server_addDataSetReader(
+        server,
+        readerGroupIdentifier,  // received this value in addReaderGroup()
+        &readerConfig, // prepared config
+        &readerIdentifier // address of the variable reader id is written to
+    );
+    //UA_DataSetReaderConfig_clear(&readerConfig);
 }
 
 int server_pubsub_subscribe_rt_state_machine(int argc, char **argv) {
