@@ -1,55 +1,18 @@
-#include "opcua_server_node.h"
+#include "rpi4_callbacks.h"
 
-UA_Server* OPCUAServerNode::server = NULL;
-UA_NodeId OPCUAServerNode::connectionIdentifier;
-UA_NetworkAddressUrlDataType OPCUAServerNode::networkAddressUrl = {
-        {0, NULL}, UA_STRING_STATIC("opc.udp://224.0.0.22:4840/")
-    };
-pthread_t OPCUAServerNode::listenThread;
-int OPCUAServerNode::listenSocket;
+// CREATE MEDIATOR OBJECT ???? 
 
-OPCUAServerNode::OPCUAServerNode()
-{
-    server = UA_Server_new();
-}
+static pthread_t listenThread;
+static int listenSocket;
 
-OPCUAServerNode::~OPCUAServerNode()
-{
-    UA_Server_delete(this->server);
-}
+static void *listenUDP(void *_);
 
-void OPCUAServerNode::run()
-{
-    this->addPubSubConnection();
-}
-
-// private methods
-void OPCUAServerNode::addPubSubConnection()
-{
-    UA_UInt32 publisherId = 3333;
-    // создаем и заполняем структуру конфиругации
-    UA_PubSubConnectionConfig connectionConfig;
-    memset (&connectionConfig, 0, sizeof(UA_PubSubConnectionConfig));
-    connectionConfig.name =  UA_STRING("Node Connection 1");
-    connectionConfig.transportProfileUri  = this->transportProfile;
-    UA_Variant_setScalar(&connectionConfig.address, &this->networkAddressUrl,
-                         &UA_TYPES[UA_TYPES_NETWORKADDRESSURLDATATYPE]);
-    connectionConfig.publisherId.idType = UA_PUBLISHERIDTYPE_UINT32;
-    connectionConfig.publisherId.id.uint32 = publisherId;
-    connectionConfig.customStateMachine = OPCUAServerNode::connectionStateMachine;
-    UA_Server_addPubSubConnection(server, &connectionConfig, &connectionIdentifier);
-
-
-}
-
-UA_StatusCode OPCUAServerNode::connectionStateMachine(UA_Server *server, const UA_NodeId componentId,
-                       void *componentContext, UA_PubSubState *state,
-                       UA_PubSubState targetState)
+OPCUA_STATE_MACHINE(rpi4_connection_sm)
 {
     int res = 0;
     if(targetState == *state)
         return UA_STATUSCODE_GOOD;
-
+    
     switch(targetState) {
         /* Disabled or Error */
         case UA_PUBSUBSTATE_ERROR:
@@ -60,7 +23,8 @@ UA_StatusCode OPCUAServerNode::connectionStateMachine(UA_Server *server, const U
                 shutdown(listenSocket, SHUT_RDWR);
             *state = targetState;
             break;
-         /* Operational */
+
+        /* Operational */
         case UA_PUBSUBSTATE_PREOPERATIONAL:
         case UA_PUBSUBSTATE_OPERATIONAL:
             if(listenSocket != 0) {
@@ -69,7 +33,7 @@ UA_StatusCode OPCUAServerNode::connectionStateMachine(UA_Server *server, const U
             }
             printf("XXX Opening the UDP multicast connection\n");
             *state = UA_PUBSUBSTATE_PREOPERATIONAL;
-            res = pthread_create(&listenThread, NULL, OPCUAServerNode::listenUDP, NULL);
+            res = pthread_create(&listenThread, NULL, listenUDP, NULL);
             if(res != 0)
                 return UA_STATUSCODE_BADINTERNALERROR;
             break;
@@ -78,14 +42,10 @@ UA_StatusCode OPCUAServerNode::connectionStateMachine(UA_Server *server, const U
         default:
             return UA_STATUSCODE_BADINTERNALERROR;
     }
-
-    
-
-
     return UA_STATUSCODE_GOOD;
 }
 
-void* OPCUAServerNode::listenUDP(void *_)
+static void *listenUDP(void *_) 
 {
     (void)_;
 
@@ -143,8 +103,8 @@ void* OPCUAServerNode::listenUDP(void *_)
     if(result < 0) {
         printf("XXX Cannot bind the socket\n");
         return NULL;
-    } 
-    
+    }
+
     /* Join the multicast group */
     if(info->ai_family == AF_INET) {
         struct ip_mreqn ipv4;
@@ -165,9 +125,9 @@ void* OPCUAServerNode::listenUDP(void *_)
         return NULL;
     }
 
-    freeaddrinfo(info); 
+    freeaddrinfo(info);
 
-        /* The connection is open, change the state to OPERATIONAL.
+    /* The connection is open, change the state to OPERATIONAL.
      * The state machine checks whether listenSocket != 0. */
     printf("XXX Listening on UDP multicast (%s, port %u)\n",
            hostnamebuf, (unsigned)port);
@@ -202,3 +162,6 @@ void* OPCUAServerNode::listenUDP(void *_)
     UA_Server_disablePubSubConnection(server, connectionIdentifier);
     return NULL;
 }
+
+
+

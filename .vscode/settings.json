@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "assert.h": "c",
+        "typeinfo": "c",
+        "socket.h": "c",
+        "opcua_server.h": "c",
+        "rpi4_callbacks.h": "c",
+        "types.h": "c",
+        "server_config_default.h": "c"
+    }
+}

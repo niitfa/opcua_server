@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(source_supervisor_dir ${CMAKE_CURRENT_SOURCE_DIR}/src_supervisor)
 set(source_node_dir ${CMAKE_CURRENT_SOURCE_DIR}/src_node)
 set(header_ext .h)
-set(source_ext .cpp)
+set(source_ext .c)
 
 # Targets
 set(target_supervisor supervisor)

@@ -285,6 +285,7 @@ addSubscribedVariables (UA_Server *server) {
         vAttr.description = UA_LOCALIZEDTEXT("en-US", "Subscribed UInt32");
         vAttr.displayName = UA_LOCALIZEDTEXT("en-US", "Subscribed UInt32");
         vAttr.dataType    = UA_TYPES[UA_TYPES_UINT32].typeId;
+        
         // Initialize the values at first to create the buffered NetworkMessage
         // with correct size and offsets
         UA_Variant value;
