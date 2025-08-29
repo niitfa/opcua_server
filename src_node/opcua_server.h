@@ -20,6 +20,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "opcua_metadata.h"
+
 #define OPCUA_STATE_MACHINE(sm)                     \
     UA_StatusCode sm (UA_Server *server,            \      
                     const UA_NodeId componentId,    \  
@@ -36,19 +38,38 @@ typedef struct
     UA_NodeId readerGroupIdentifier;
     UA_NodeId readerIdentifier;
     UA_DataSetReaderConfig readerConfig;
+    UA_PubSubConnectionConfig connectionConfig;
+    UA_ReaderGroupConfig readerGroupConfig;
 
-    OPCUA_STATE_MACHINE((*connectionStateMachine));
+    OPCUA_MetaData_t opcuaReaderMetaData;
 } OPCUA_Server_t;
 
 void OPCUA_Server_init(OPCUA_Server_t *self);
-void OPCUA_Server_new(OPCUA_Server_t *self);
-void OPCUA_Server_set_network_address_url(OPCUA_Server_t *self, UA_NetworkAddressUrlDataType url);
-void OPCUA_Server_set_transport_profile(OPCUA_Server_t *self, UA_String profile);
-void OPCUA_Server_set_connection_state_machine(
-    OPCUA_Server_t *self,
+void OPCUA_Server_deinit(OPCUA_Server_t *self);
+void OPCUA_Server_set_network_address_url(OPCUA_Server_t *self, 
+    UA_NetworkAddressUrlDataType url
+);
+void OPCUA_Server_set_transport_profile(OPCUA_Server_t *self, 
+    UA_String profile
+);
+void OPCUA_Server_add_pubsub_connection(OPCUA_Server_t* self,
+    UA_String name,
+    UA_UInt32 publisherId,
     OPCUA_STATE_MACHINE((*sm))
 );
-
-
+void OPCUA_Server_add_reader_group(OPCUA_Server_t* self, 
+    UA_String name
+);
+void OPCUA_Server_set_reader_metadata(OPCUA_Server_t* self,
+    OPCUA_MetaData_t* metaData
+);
+void OPCUA_Server_add_data_set_reader(OPCUA_Server_t* self,
+    UA_String name,
+    UA_UInt16 publisherId,
+    UA_UInt16 writerGroupId,
+    UA_UInt16 dataSetWriterId  
+);
+void OPCUA_Server_add_subscribed_variables(OPCUA_Server_t* self);
+void OPCUA_Server_run(OPCUA_Server_t* self);
 
 #endif

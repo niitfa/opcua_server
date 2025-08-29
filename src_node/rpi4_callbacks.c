@@ -2,10 +2,16 @@
 
 // CREATE MEDIATOR OBJECT ???? 
 
+static OPCUA_Server_t* opcuaServer = NULL;
 static pthread_t listenThread;
 static int listenSocket;
 
 static void *listenUDP(void *_);
+
+void rpi4_set_parent_server(OPCUA_Server_t* server)
+{
+    opcuaServer = server;    
+}
 
 OPCUA_STATE_MACHINE(rpi4_connection_sm)
 {
@@ -58,7 +64,7 @@ static void *listenUDP(void *_)
     /* Extract the hostname */
     UA_UInt16 port = 0;
     UA_String hostname = UA_STRING_NULL;
-    UA_parseEndpointUrl(&networkAddressUrl.url, &hostname, &port, NULL);
+    UA_parseEndpointUrl(&opcuaServer->networkAddressUrl.url, &hostname, &port, NULL);
 
     /* Get all the interface and IPv4/6 combinations for the configured hostname */
     struct addrinfo hints, *info;
@@ -131,7 +137,7 @@ static void *listenUDP(void *_)
      * The state machine checks whether listenSocket != 0. */
     printf("XXX Listening on UDP multicast (%s, port %u)\n",
            hostnamebuf, (unsigned)port);
-    UA_Server_enablePubSubConnection(server, connectionIdentifier);
+    UA_Server_enablePubSubConnection(opcuaServer->server, opcuaServer->connectionIdentifier);
 
     /* Poll and process in a loop.
      * The socket is closed in the state machine and */
@@ -149,7 +155,7 @@ static void *listenUDP(void *_)
             if(size > 0) {
                 printf("XXX Received a packet\n");
                 UA_ByteString packet = {(size_t)size, (UA_Byte*)buf};
-                UA_Server_processPubSubConnectionReceive(server, connectionIdentifier, packet);
+                UA_Server_processPubSubConnectionReceive(opcuaServer->server, opcuaServer->connectionIdentifier, packet);
             }
         }
     }
@@ -159,7 +165,7 @@ static void *listenUDP(void *_)
     /* Clean up and notify the state machine */
     close(listenSocket);
     listenSocket = 0;
-    UA_Server_disablePubSubConnection(server, connectionIdentifier);
+    UA_Server_disablePubSubConnection(opcuaServer->server, opcuaServer->connectionIdentifier);
     return NULL;
 }
 

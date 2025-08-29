@@ -6,6 +6,9 @@
         "opcua_server.h": "c",
         "rpi4_callbacks.h": "c",
         "types.h": "c",
-        "server_config_default.h": "c"
+        "server_config_default.h": "c",
+        "server.h": "c",
+        "types_generated.h": "c",
+        "opcua_metadata.h": "c"
     }
 }
