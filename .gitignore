@@ -2,6 +2,5 @@
 CMakeCache.txt
 cmake_install.cmake
 Makefile
-supervisor
-node
+cli
 CMakeFiles/

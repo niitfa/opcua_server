@@ -9,6 +9,7 @@
         "server_config_default.h": "c",
         "server.h": "c",
         "types_generated.h": "c",
-        "opcua_metadata.h": "c"
+        "opcua_metadata.h": "c",
+        "cstdlib": "c"
     }
 }
